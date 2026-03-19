@@ -1,7 +1,7 @@
 const joi=require("joi");
 
 exports.driverSchema=joi.object({
-Name: joi.string().required(),
+name: joi.string().required(),
 email:joi.string().email().required(),
 phone:joi.string().required(),
 vehicleType: joi.string().required(),

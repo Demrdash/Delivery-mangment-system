@@ -1,30 +1,22 @@
 const mongoose = require("mongoose");
 
-const driverSchema = new mongoose.Schema(
-{
-    name:{
-        type:String,
-        required:true,
-        trim:true
-    },
+const driverSchema = new mongoose.Schema({
 
-    phone:{
-        type:String,
-        required:true,
-        match:/^[0-9]{11}$/
-    },
-
-    email:{
-        type:String,
-        required:true,
-        unique:true,
-        lowercase:true
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
     },
 
     vehicleType:{
         type:String,
-        required:true,
-        enum:["bike","car","truck"]
+        enum:["bike","car","truck"],
+        required:true
+    },
+
+    licenseNumber:{
+        type:String,
+        required:true
     },
 
     isAvailable:{
@@ -32,10 +24,8 @@ const driverSchema = new mongoose.Schema(
         default:true
     }
 
-},
-{
+},{
     timestamps:true
-}
-);
+})
 
-module.exports = mongoose.model("Driver",driverSchema);
+module.exports = mongoose.model("Driver",driverSchema)

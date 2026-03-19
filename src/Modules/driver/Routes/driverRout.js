@@ -5,22 +5,25 @@ const router = express.Router();
 const driverControl = require("../controllers/driverControler")
 const validate = require("../../../../src/middlewares/validates");
 const { driverSchema } = require("../Validator/driverValidator");
+const verifyToken = require("../../../middlewares/Authmiddlewares");
+const allowedto = require("../../../middlewares/allowedto");
+const userRole = require("../../../utils/UserRole");
 
 //!adding driver
 
 
 // console.log(driverdb)
-router.post("/", validate(driverSchema), driverControl.addDriver)
+router.post("/", verifyToken, allowedto(userRole.Admin) ,validate(driverSchema), driverControl.addDriver)
 //!getAllDriver
-router.get("/", driverControl.getDriverAll)
+router.get("/",  verifyToken,allowedto(userRole.Admin), driverControl.getDriverAll)
 
 //!getDriverByID
 //!delete
 //!update
 router.route("/:driverID")
 .get(driverControl.getDriverId)
-    .patch(driverControl.updataInfo)
-    .delete(driverControl.deleteDriverInfo)
+    .patch(verifyToken,allowedto(userRole.Admin),driverControl.updataInfo)
+    .delete(verifyToken,allowedto(userRole.Admin),driverControl.deleteDriverInfo)
 
 
 
