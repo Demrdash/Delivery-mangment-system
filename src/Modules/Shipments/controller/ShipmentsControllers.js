@@ -1,6 +1,6 @@
-const Shipment = require("../model/shipment");
+const Shipment = require("../model/Shipmentsmodel");
 
-
+const asyncWrapper = require("../../../middlewares/errormiddl")
 exports.createShipment = async (req, res) => {
   try {
     const shipment = await Shipment.create(req.body);
@@ -70,7 +70,7 @@ exports.partialUpdateShipment = async (req, res) => {
 };
 
 //assign
-const assignShipment = asyncWrapper(async (req, res, next) => {
+exports.assignShipment = asyncWrapper(async (req, res, next) => {
     const { id, driverId } = req.params;
 
    

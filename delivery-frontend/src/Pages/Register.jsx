@@ -11,14 +11,32 @@ export default function Register() {
     defaultValues: { role: "driver" }
   });
 
-  const { user, loading } = useSelector((s) => s.auth);
+  const { user, loading ,error,fieldErrors} = useSelector((s) => s.auth);
   const [showPassword, setShowPassword] = useState(false);
   
   
   const selectedRole = watch("role");
 
-  const onSubmit = (data) => {
-    dispatch(registerUser(data));
+  const onSubmit = async (data) => {
+    //   console.log("Form submitted:", data);
+
+    // dispatch(registerUser(data));
+
+     try {
+      const resultAction = await dispatch(registerUser(data));
+
+      if (registerUser.fulfilled.match(resultAction)) {
+       
+        navigate("/login");
+      } else {
+        
+        console.log("Register failed:", resultAction.payload);
+      }
+    } catch (err) {
+      console.log("Unexpected error:", err);
+    }
+
+
   };
 
   useEffect(() => {
@@ -38,7 +56,7 @@ export default function Register() {
           className="absolute inset-0 w-full h-full object-cover opacity-40" 
           alt="Logistics" 
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/80 to-slate-900" />
+        <div className="absolute inset-0 bg-linear-to-b from-slate-900/60 via-slate-900/80 to-slate-900" />
         
         {/* Logo Text */}
         <div className="relative z-10">
@@ -86,8 +104,41 @@ export default function Register() {
                 placeholder="James Wilson" 
               />
               {errors.name && <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-tighter">{errors.name.message}</p>}
+                 {/* err msg from back */}
+                {error && (
+        <p className="text-red-500 text-sm mt-2 font-bold">
+          {fieldErrors.name}
+        </p>
+      )}
             </div>
-
+          {/* Phone */}
+<div className="group">
+  <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-blue-600 transition-colors">
+    Phone
+  </label>
+  <input
+    {...register("phone", {
+      required: "Phone is required",
+      pattern: { value: /^[0-9]{7,15}$/, message: "Invalid phone number" }
+    })}
+    className={`w-full py-4 bg-transparent border-b-2 ${
+      errors.phone ? "border-red-500" : "border-slate-200"
+    } focus:border-blue-600 outline-none transition-all text-lg font-medium`}
+    placeholder="01055585"
+  />
+  
+  {errors.phone && (
+    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-tighter">
+      {errors.phone.message}
+    </p>
+  )}
+     {/* err msg from back */}
+                {error && (
+        <p className="text-red-500 text-sm mt-2 font-bold">
+          {fieldErrors.email}
+        </p>
+      )}
+</div>
             {/* Email */}
             <div className="group">
               <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-blue-600 transition-colors">Work Email</label>
@@ -100,6 +151,13 @@ export default function Register() {
                 placeholder="james@company.com" 
               />
               {errors.email && <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-tighter">{errors.email.message}</p>}
+              {/* err msg from back */}
+                {error && (
+        <p className="text-red-500 text-sm mt-2 font-bold">
+          {fieldErrors.phone}
+        </p>
+      )}
+
             </div>
 
             {/* Password */}
@@ -115,6 +173,12 @@ export default function Register() {
                   className={`w-full py-4 bg-transparent border-b-2 ${errors.password ? 'border-red-500' : 'border-slate-200'} focus:border-blue-600 outline-none transition-all text-lg font-medium`} 
                   placeholder="••••••••" 
                 />
+                   {/* err msg from back */}
+                {error && (
+        <p className="text-red-500 text-sm mt-2 font-bold">
+          {fieldErrors.password}
+        </p>
+      )}
                 <button 
                   type="button" 
                   onClick={() => setShowPassword(!showPassword)} 
@@ -125,7 +189,54 @@ export default function Register() {
               </div>
               {errors.password && <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-tighter">{errors.password.message}</p>}
             </div>
+                  {/* Vehicle Type */}
+<div className="group">
+  <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-blue-600 transition-colors">
+    Vehicle Type
+  </label>
+  <input
+    {...register("vehicleType", { required: "Vehicle type is required" })}
+    className={`w-full py-4 bg-transparent border-b-2 ${
+      errors.vehicleType ? "border-red-500" : "border-slate-200"
+    } focus:border-blue-600 outline-none transition-all text-lg font-medium`}
+    placeholder="car / truck / van"
+  />
+  {errors.vehicleType && (
+    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-tighter">
+      {errors.vehicleType.message}
+    </p>
+  )}
+     {/* err msg from back */}
+     {fieldErrors.vehicleType && (
+          <p className="text-red-500">{fieldErrors.vehicleType}</p>
+        )}
 
+</div>
+
+{/* License Number */}
+<div className="group">
+  <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-blue-600 transition-colors">
+    License Number
+  </label>
+  <input
+    {...register("licenseNumber", { required: "License number is required" })}
+    className={`w-full py-4 bg-transparent border-b-2 ${
+      errors.licenseNumber ? "border-red-500" : "border-slate-200"
+    } focus:border-blue-600 outline-none transition-all text-lg font-medium`}
+    placeholder="ABC1234"
+  />
+  {errors.licenseNumber && (
+    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-tighter">
+      {errors.licenseNumber.message}
+    </p>
+  )}
+     {/* err msg from back */}
+                {error && (
+        <p className="text-red-500 text-sm mt-2 font-bold">
+          {fieldErrors.licenseNumber}
+        </p>
+      )}
+</div>
             {/* Role Selection (Minimalist Cards) */}
             <div className="pt-4">
               <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Registering as:</label>

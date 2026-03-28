@@ -6,7 +6,8 @@ const registerSchema = Joi.object({
   password: Joi.string().min(6).required(),
   phone: Joi.string().required(),
   vehicleType: Joi.string().valid("bike", "car", "truck").required(),
-  licenseNumber: Joi.string().required()
+  licenseNumber: Joi.string().required(),
+  role: Joi.string().valid("driver", "admin").default("driver")
 });
 
 const loginSchema= Joi.object({

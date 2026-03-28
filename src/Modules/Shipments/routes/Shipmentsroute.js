@@ -3,7 +3,7 @@ const router = express.Router();
 const { createShipmentValidator } = require("../validator/Shipmentsvalidator");
 
 
-const shipmentController = require("../controllers/shipmentController");
+const shipmentController = require("../controller/ShipmentsControllers");
 const validate = require("../../../middlewares/validates");
 const verifyToken = require("../../../middlewares/Authmiddlewares");
 const allowedto = require("../../../middlewares/allowedto");
@@ -24,7 +24,7 @@ router.put(
     "/:id/assign/:driverId",
     verifyToken,
     allowedto("admin"),
-    assignShipment
+    shipmentController.assignShipment
 );
 
 module.exports = router;
