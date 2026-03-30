@@ -1,11 +1,12 @@
 const Shipment = require("../model/Shipmentsmodel");
-
+const Driver = require("../../driver/model/drivermodel"); // لازم تعمل import للـ Driver model
 const asyncWrapper = require("../../../middlewares/errormiddl")
 exports.createShipment = async (req, res) => {
   try {
     const shipment = await Shipment.create(req.body);
     res.status(201).json(shipment);
   } catch (error) {
+    console.error("Create shipment error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -71,46 +72,44 @@ exports.partialUpdateShipment = async (req, res) => {
 
 //assign
 exports.assignShipment = asyncWrapper(async (req, res, next) => {
-    const { id, driverId } = req.params;
+  const { id, driverId } = req.params;
 
-   
-    const shipment = await shipmentModel.findById(id);
-    if (!shipment) {
-        return next(AppError.create("Shipment not found", 404));
-    }
+  const shipment = await Shipment.findById(id);
+  if (!shipment) {
+    return next(AppError.create("Shipment not found", 404));
+  }
 
-   
-    if (shipment.driver) {
-        return next(AppError.create("Shipment already assigned", 400));
-    }
+  if (shipment.driver) {
+    return next(AppError.create("Shipment already assigned", 400));
+  }
 
-   
-    const driver = await driverModel.findById(driverId);
-    if (!driver) {
-        return next(AppError.create("Driver not found", 404));
-    }
+  const driver = await Driver.findById(driverId);
+  if (!driver) {
+    return next(AppError.create("Driver not found", 404));
+  }
 
-  
-    if (!driver.isAvailable) {
-        return next(AppError.create("Driver not available", 400));
-    }
+  if (!driver.isAvailable) {
+    return next(AppError.create("Driver not available", 400));
+  }
 
+  shipment.driver = driverId;
+  shipment.status = "assigned";
+  driver.isAvailable = false;
 
-    shipment.driver = driverId;
-    shipment.status = "assigned";
+  await shipment.save();
+  await driver.save();
 
-
-    driver.isAvailable = false;
-
-    
-    await shipment.save();
-    await driver.save();
-
-    res.status(200).json({
-        status: "success",
-        message: "Shipment assigned successfully",
-        data: {
-            shipment
-        }
-    });
+  res.status(200).json({
+    status: "success",
+    message: "Shipment assigned successfully",
+    data: { shipment }
+  });
 });
+exports.getShipmentsByDriver = async (req, res) => {
+  try {
+    const shipments = await Shipment.find({ driver: req.params.driverId });
+    res.json({ status: "success", data: shipments });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

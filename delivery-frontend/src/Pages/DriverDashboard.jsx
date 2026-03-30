@@ -1,49 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import api from '../services/api';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchDriverShipments, changeShipmentStatus } from "../features/driver/driverSlice";
 
 export default function DriverDashboard() {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const [shipments, setShipments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { shipments, loading } = useSelector((state) => state.driver);
 
   useEffect(() => {
-    fetchMyShipments();
-  }, [user]);
-
-  const fetchMyShipments = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const { data } = await api.get('/shipments');
-      // Ensure allShipments is always an array to prevent .filter() crash
-      const rawData = data?.data || data;
-      const allShipments = Array.isArray(rawData) ? rawData : [];
-      
-      // Filter by: shipment.driver === user._id
-      const myShipments = allShipments.filter(shipment => {
-        // Handle standard string ID or populated object ID
-        const driverId = typeof shipment.driver === 'object' && shipment.driver !== null 
-          ? shipment.driver._id 
-          : shipment.driver;
-        return driverId === user._id;
-      });
-      setShipments(myShipments);
-    } catch (error) {
-      console.error('Error fetching driver shipments:', error);
+    if (user) {
+      dispatch(fetchDriverShipments(user.id));
     }
-    setLoading(false);
-  };
+  }, [user, dispatch]);
 
-  const handleStatusUpdate = async (shipmentId, newStatus) => {
-    try {
-      // Backend uses PUT or PATCH
-      await api.patch(`/shipments/${shipmentId}`, { status: newStatus });
-      fetchMyShipments();
-    } catch (error) {
-      console.error('Error updating status:', error);
-      alert('Failed to update status');
-    }
+  const handleStatusUpdate = (shipmentId, newStatus) => {
+    dispatch(changeShipmentStatus({ shipmentId, newStatus }));
   };
 
   if (loading) return <div className="p-8 text-center text-slate-500">Loading Dashboard...</div>;
@@ -89,7 +60,13 @@ export default function DriverDashboard() {
 
                   {/* Status & Actions */}
                   <div className="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                    <div className={`px-3 py-1 rounded-md text-sm font-bold w-fit ${ship.status === 'delivered' ? 'bg-green-100 text-green-700' : ship.status === 'in-transit' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    <div className={`px-3 py-1 rounded-md text-sm font-bold w-fit ${
+                      ship.status === 'delivered'
+                        ? 'bg-green-100 text-green-700'
+                        : ship.status === 'in-transit'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
                       {ship.status || 'pending'}
                     </div>
 

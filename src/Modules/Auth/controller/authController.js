@@ -97,12 +97,12 @@ const login = asyncWrapper(async (req, res, next) => {
     const token = await generateToken({ email: user.email, id: user._id, role: user.role })
 
     res.status(201).json({
-        status: httpStat.success, data: token, user: {
+        status: httpStat.success, data: {token, user: {
             id: user._id,
             name: user.name,
             email: user.email,
             role: user.role
-        }
+        }}
     })
 })
 

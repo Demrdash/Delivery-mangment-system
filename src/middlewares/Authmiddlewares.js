@@ -11,10 +11,13 @@ const authHeader = req.headers.authorization;
         return next(error);
     }
     const token = authHeader.split(' ')[1];
-    console.log(token);
+    
+//     console.log("AuthHeader:", authHeader);
+// console.log("Token:", token);
+
     try{
          const decode= jwt.verify(token,process.env.JWT_SECRET);
-          req.currentUser=decode;
+        req.user=decode;
     console.log(decode);
     next();
     }catch(err){
